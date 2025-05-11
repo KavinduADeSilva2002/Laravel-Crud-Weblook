@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { usePage } from '@inertiajs/vue3'
 
-const { customerCount } = usePage().props
+const { customerCount, invoiceCount } = usePage().props
 </script>
 
 <template>
@@ -18,6 +18,12 @@ const { customerCount } = usePage().props
           <div class="bg-white shadow rounded-lg p-6">
             <div class="text-sm font-medium text-gray-500">Total Customers</div>
             <div class="mt-2 text-3xl font-bold text-gray-900">{{ customerCount }}</div>
+          </div>
+
+          <!-- Invoice Count Card -->
+          <div class="bg-white shadow rounded-lg p-6">
+            <div class="text-sm font-medium text-gray-500">Total Invoices</div>
+            <div class="mt-2 text-3xl font-bold text-gray-900">{{ invoiceCount }}</div>
           </div>
         </div>
       </div>
