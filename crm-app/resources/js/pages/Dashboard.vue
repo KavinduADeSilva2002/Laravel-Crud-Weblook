@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { usePage } from '@inertiajs/vue3'
 
-const { customerCount, invoiceCount } = usePage().props
+const { customerCount, invoiceCount, proposalCount } = usePage().props
 </script>
 
 <template>
@@ -13,6 +13,16 @@ const { customerCount, invoiceCount } = usePage().props
 
     <div class="py-12">
       <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+
+        <!-- Title and Welcome Message -->
+        <div class="mb-8 text-center">
+          <h1 class="text-3xl font-bold text-gray-800">Weblook CRM Application</h1>
+          <p class="mt-2 text-lg text-gray-600">
+            You have successfully logged in to the Weblook CRM Application.
+          </p>
+        </div>
+
+        <!-- Stats Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Customer Count Card -->
           <div class="bg-blue-500 text-white shadow rounded-lg p-6">
@@ -21,10 +31,16 @@ const { customerCount, invoiceCount } = usePage().props
           </div>
 
           <!-- Invoice Count Card -->
-          <div class="bg-lime-400 text-white shadow rounded-lg p-6">
+          <div class="bg-lime-700 text-white shadow rounded-lg p-6">
             <div class="text-sm font-medium">Total Invoices</div>
             <div class="mt-2 text-3xl font-bold">{{ invoiceCount }}</div>
           </div>
+          <!-- Proposal Count Card -->
+            <div class="bg-amber-600 text-white shadow rounded-lg p-6">
+            <div class="text-sm font-medium">Total Proposals</div>
+            <div class="mt-2 text-3xl font-bold">{{ proposalCount }}</div>
+            </div>
+
         </div>
       </div>
     </div>
