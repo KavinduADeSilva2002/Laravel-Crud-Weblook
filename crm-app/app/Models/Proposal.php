@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Proposal extends Model
 {
@@ -11,9 +12,11 @@ class Proposal extends Model
     protected $fillable = [
         'customer_id',
         'title',
-        'details',
+        'description',
+        'amount',
         'status',
     ];
+
 
     public function customer()
     {

@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
+use App\Models\Proposal;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ProposalController extends Controller
 {
     public function index()
     {
-        return Proposal::with('customer')->latest()->get();
+        $customers = Customer::all();
+        return Inertia::render('Proposals/Index', [
+            'customers' => $customers,
+        ]);
     }
 
     public function store(Request $request)
@@ -16,32 +22,13 @@ class ProposalController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'title' => 'required|string|max:255',
-            'details' => 'required|string',
+            'description' => 'required|string',
+            'amount' => 'required|numeric|min:0',
+            'status' => 'required|in:Pending,Approved,Rejected',
         ]);
 
-        return Proposal::create($validated)->load('customer');
-    }
+        Proposal::create($validated);
 
-    public function show(Proposal $proposal)
-    {
-        return $proposal->load('customer');
-    }
-
-    public function update(Request $request, Proposal $proposal)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'details' => 'required|string',
-            'status' => 'in:pending,approved,rejected',
-        ]);
-
-        $proposal->update($validated);
-        return $proposal->load('customer');
-    }
-
-    public function destroy(Proposal $proposal)
-    {
-        $proposal->delete();
-        return response()->noContent();
+        return redirect()->route('proposals.index')->with('success', 'Proposal created successfully.');
     }
 }
