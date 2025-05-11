@@ -1,60 +1,33 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Customer;
 use App\Models\Invoice;
-use Str;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
 class InvoiceController extends Controller
 {
     public function index()
     {
-        return Invoice::with('customer')->latest()->get();
+        $customers = Customer::all();
+        return Inertia::render('Invoices/Index', [
+            'customers' => $customers,
+        ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
-            'issue_date' => 'required|date',
-            'due_date' => 'required|date|after_or_equal:issue_date',
-            'amount' => 'required|numeric',
-            'notes' => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'total_payment' => 'required|numeric|min:0',
+            'due_date' => 'required|date',
         ]);
 
-        $invoice = Invoice::create([
-            ...$validated,
-            'invoice_number' => 'INV-' . strtoupper(Str::random(8)),
-            'status' => 'draft',
-        ]);
+        Invoice::create($validated);
 
-        return $invoice->load('customer');
-    }
-
-    public function show(Invoice $invoice)
-    {
-        return $invoice->load('customer');
-    }
-
-    public function update(Request $request, Invoice $invoice)
-    {
-        $validated = $request->validate([
-            'issue_date' => 'required|date',
-            'due_date' => 'required|date|after_or_equal:issue_date',
-            'amount' => 'required|numeric',
-            'status' => 'in:draft,sent,paid,cancelled',
-            'notes' => 'nullable|string',
-        ]);
-
-        $invoice->update($validated);
-
-        return $invoice->load('customer');
-    }
-
-    public function destroy(Invoice $invoice)
-    {
-        $invoice->delete();
-        return response()->noContent();
+        return redirect()->route('invoices.index')->with('success', 'Invoice created.');
     }
 }
-
