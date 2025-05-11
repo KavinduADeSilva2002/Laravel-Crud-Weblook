@@ -5,7 +5,7 @@
     </template>
 
     <!-- Form -->
-    <div v-if="showForm" class="max-w-2xl mx-auto mt-8 p-6 bg-white shadow rounded">
+    <div class="max-w-2xl mx-auto mt-8 p-6 bg-white shadow rounded">
       <form @submit.prevent="submitForm">
         <div class="mb-4">
           <label class="block font-medium mb-1">Customer</label>
@@ -90,13 +90,9 @@ import { useForm, usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import axios from 'axios'
 
-// Props from server
 const customers = usePage().props.customers
 const proposals = ref(usePage().props.proposals || [])
-
-// Form & state
 const editingProposal = ref(null)
-const showForm = ref(true)
 
 const form = useForm({
   customer_id: '',
@@ -113,9 +109,6 @@ const submitForm = async () => {
     } else {
       await axios.post('/proposals', form)
     }
-    form.reset('customer_id', 'title', 'description', 'amount', 'status')
-    editingProposal.value = null
-    showForm.value = true
     window.location.reload()
   } catch (err) {
     console.error('Error saving proposal:', err)
@@ -129,7 +122,6 @@ const editProposal = (proposal) => {
   form.description = proposal.description
   form.amount = proposal.amount
   form.status = proposal.status
-  showForm.value = true
 }
 
 const deleteProposal = async (id) => {
