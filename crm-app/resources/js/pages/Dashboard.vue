@@ -15,15 +15,15 @@ const { customerCount, invoiceCount } = usePage().props
       <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Customer Count Card -->
-          <div class="bg-white shadow rounded-lg p-6">
-            <div class="text-sm font-medium text-gray-500">Total Customers</div>
-            <div class="mt-2 text-3xl font-bold text-gray-900">{{ customerCount }}</div>
+          <div class="bg-blue-500 text-white shadow rounded-lg p-6">
+            <div class="text-sm font-medium">Total Customers</div>
+            <div class="mt-2 text-3xl font-bold">{{ customerCount }}</div>
           </div>
 
           <!-- Invoice Count Card -->
-          <div class="bg-white shadow rounded-lg p-6">
-            <div class="text-sm font-medium text-gray-500">Total Invoices</div>
-            <div class="mt-2 text-3xl font-bold text-gray-900">{{ invoiceCount }}</div>
+          <div class="bg-lime-400 text-white shadow rounded-lg p-6">
+            <div class="text-sm font-medium">Total Invoices</div>
+            <div class="mt-2 text-3xl font-bold">{{ invoiceCount }}</div>
           </div>
         </div>
       </div>
