@@ -3,23 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use Inertia\Inertia;
 use App\Models\Invoice;
 use App\Models\Proposal;
-
+use App\Models\Transaction;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
     public function index()
-{
-    $customerCount = Customer::count();
-    $invoiceCount = Invoice::count(); 
-    $proposalCount = Proposal::count(); 
-
-    return Inertia::render('Dashboard', [
-        'customerCount' => $customerCount,
-        'invoiceCount' => $invoiceCount, 
-        'proposalCount' => $proposalCount
-    ]);
-}
+    {
+        return Inertia::render('Dashboard', [
+            'customerCount'    => Customer::count(),
+            'invoiceCount'     => Invoice::count(),
+            'proposalCount'    => Proposal::count(),
+            'transactionCount' => Transaction::count(), // ✅ Added this line
+        ]);
+    }
 }
