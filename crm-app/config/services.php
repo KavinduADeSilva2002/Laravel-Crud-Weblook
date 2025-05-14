@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // ✅ Stripe integration added
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'key' => env('STRIPE_KEY'),
+    ],
+
 ];
