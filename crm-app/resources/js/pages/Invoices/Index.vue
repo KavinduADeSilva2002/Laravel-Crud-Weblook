@@ -72,6 +72,7 @@
             <td class="border px-4 py-2 space-x-2">
               <button @click="editInvoice(invoice)" class="bg-yellow-500 text-white px-3 py-1 rounded">Update</button>
               <button @click="deleteInvoice(invoice.id)" class="bg-red-600 text-white px-3 py-1 rounded">Delete</button>
+              <button @click="sendInvoiceEmail(invoice.id)" class="bg-green-600 text-white px-3 py-1 rounded">Send Email</button>
             </td>
           </tr>
         </tbody>
@@ -88,7 +89,6 @@ import axios from 'axios'
 
 const customers = usePage().props.customers
 const invoices = ref(usePage().props.invoices || [])
-
 const editingInvoice = ref(null)
 
 const form = useForm({
@@ -129,6 +129,16 @@ const deleteInvoice = async (id) => {
     } catch (err) {
       console.error('Error deleting invoice:', err)
     }
+  }
+}
+
+const sendInvoiceEmail = async (id) => {
+  try {
+    await axios.get(`/invoices/send-email/${id}`)
+    alert('Invoice email sent successfully.')
+  } catch (err) {
+    alert('Failed to send email.')
+    console.error('Email send error:', err)
   }
 }
 
