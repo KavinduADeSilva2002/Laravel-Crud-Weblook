@@ -3,12 +3,14 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\DashboardController;
 use Inertia\Inertia;
+use App\Mail\MyEmail;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -62,3 +64,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
 });
 
+Route::get('/send-test-mail', function () {
+    $message = "Hello from Laravel!";
+
+    Mail::to('someone@example.com')->send(new MyEmail($message));
+
+    return "Test email sent successfully!";
+});
