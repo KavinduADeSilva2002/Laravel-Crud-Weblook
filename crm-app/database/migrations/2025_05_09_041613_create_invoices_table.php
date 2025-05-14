@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('invoices', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-        $table->string('name');
-        $table->string('email');
-        $table->decimal('total_payment', 10, 2);
-        $table->date('due_date');
-        $table->timestamps();
-    });
-        
+            $table->id();
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->string('email');
+            $table->decimal('total_payment', 10, 2);
+            $table->date('due_date');
+            $table->string('status')->default('Pending');
+            $table->timestamps();
+        });
     }
 
     /**

@@ -9,10 +9,10 @@
       <form @submit.prevent="submitForm">
         <div class="mb-4">
           <label class="block font-medium mb-1">Customer</label>
-          <select v-model="form.customer_id" class="w-full border p-2 rounded" required>
-            <option disabled value="">Select a customer</option>
+          <select v-model="form.customer_id" @change="updateCustomerDetails" class="w-full border p-2 rounded" required>
+            <option value="">Select Customer</option>
             <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-              {{ customer.full_name }} (ID: {{ customer.id }})
+              {{ customer.full_name }}
             </option>
           </select>
         </div>
@@ -54,25 +54,39 @@
       <table class="w-full border-collapse table-auto">
         <thead class="bg-gray-200">
           <tr>
-            <th class="border px-4 py-2">Customer ID</th>
-            <th class="border px-4 py-2">Name</th>
-            <th class="border px-4 py-2">Email</th>
-            <th class="border px-4 py-2">Total</th>
-            <th class="border px-4 py-2">Due Date</th>
-            <th class="border px-4 py-2">Actions</th>
+            <th class="p-3 text-left">Customer</th>
+            <th class="p-3 text-left">Name</th>
+            <th class="p-3 text-left">Email</th>
+            <th class="p-3 text-left">Amount</th>
+            <th class="p-3 text-left">Due Date</th>
+            <th class="p-3 text-left">Status</th>
+            <th class="p-3 text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="invoice in invoices" :key="invoice.id" class="hover:bg-gray-100">
-            <td class="border px-4 py-2">{{ invoice.customer_id }}</td>
-            <td class="border px-4 py-2">{{ invoice.name }}</td>
-            <td class="border px-4 py-2">{{ invoice.email }}</td>
-            <td class="border px-4 py-2">{{ invoice.total_payment }}</td>
-            <td class="border px-4 py-2">{{ invoice.due_date }}</td>
-            <td class="border px-4 py-2 space-x-2">
-              <button @click="editInvoice(invoice)" class="bg-yellow-500 text-white px-3 py-1 rounded">Update</button>
-              <button @click="deleteInvoice(invoice.id)" class="bg-red-600 text-white px-3 py-1 rounded">Delete</button>
-              <button @click="sendInvoiceEmail(invoice.id)" class="bg-green-600 text-white px-3 py-1 rounded">Send Email</button>
+            <td class="p-3">{{ getCustomerName(invoice.customer_id) }}</td>
+            <td class="p-3">{{ invoice.name }}</td>
+            <td class="p-3">{{ invoice.email }}</td>
+            <td class="p-3">${{ invoice.total_payment }}</td>
+            <td class="p-3">{{ formatDate(invoice.due_date) }}</td>
+            <td class="p-3">
+              <span :class="getStatusClass(invoice.status || 'Pending')">
+                {{ invoice.status || 'Pending' }}
+              </span>
+            </td>
+            <td class="p-3">
+              <div class="flex gap-2">
+                <button @click="editInvoice(invoice)" class="text-blue-600 hover:text-blue-800">
+                  Edit
+                </button>
+                <button @click="sendInvoiceEmail(invoice.id)" class="text-green-600 hover:text-green-800">
+                  Send Email
+                </button>
+                <button @click="deleteInvoice(invoice.id)" class="text-red-600 hover:text-red-800">
+                  Delete
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -86,8 +100,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import axios from 'axios'
-// import { stripCheckout } from '@vue-Stripe/vue-stripe'; 
-// nikn liwwa ekk..psse blnn
 
 const customers = usePage().props.customers
 const invoices = ref(usePage().props.invoices || [])
@@ -101,12 +113,25 @@ const form = useForm({
   due_date: ''
 })
 
+const updateCustomerDetails = () => {
+  const selectedCustomer = customers.find(c => c.id === form.customer_id)
+  if (selectedCustomer) {
+    form.name = selectedCustomer.full_name
+    form.email = selectedCustomer.email
+  }
+}
+
+const getCustomerName = (customerId) => {
+  const customer = customers.find(c => c.id === customerId)
+  return customer ? customer.full_name : 'N/A'
+}
+
 const submitForm = async () => {
   try {
     if (editingInvoice.value) {
       await axios.put(`/invoices/${editingInvoice.value.id}`, form.data())
     } else {
-      await axios.post('/invoices', form)
+      await axios.post('/invoices', form.data())
     }
     window.location.reload()
   } catch (err) {
@@ -137,7 +162,7 @@ const deleteInvoice = async (id) => {
 const sendInvoiceEmail = async (id) => {
   try {
     await axios.get(`/invoices/send-email/${id}`)
-    alert('Invoice email sent successfully.')
+    alert('Invoice email sent successfully!')
   } catch (err) {
     alert('Failed to send email.')
     console.error('Email send error:', err)
@@ -146,6 +171,20 @@ const sendInvoiceEmail = async (id) => {
 
 const cancelEdit = () => {
   editingInvoice.value = null
-  form.reset('customer_id', 'name', 'email', 'total_payment', 'due_date')
+  form.reset()
+}
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString()
+}
+
+const getStatusClass = (status) => {
+  const baseClass = 'px-2 py-1 rounded-full text-xs font-semibold'
+  const statusClasses = {
+    'Pending': 'bg-yellow-100 text-yellow-800',
+    'Paid': 'bg-green-100 text-green-800',
+    'Overdue': 'bg-red-100 text-red-800'
+  }
+  return `${baseClass} ${statusClasses[status] || ''}`
 }
 </script>
