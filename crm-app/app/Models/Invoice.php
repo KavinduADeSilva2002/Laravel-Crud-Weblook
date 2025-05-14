@@ -15,6 +15,11 @@ class Invoice extends Model
         'email',
         'total_payment',
         'due_date',
+        'status',
+    ];
+
+    protected $attributes = [
+        'status' => 'Pending'
     ];
 
     public function customer()

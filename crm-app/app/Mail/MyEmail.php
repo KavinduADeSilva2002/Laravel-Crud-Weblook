@@ -11,26 +11,22 @@ class MyEmail extends Mailable
     use Queueable, SerializesModels;
 
     public string $messageText;
+    public int $invoice_id;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param string $messageText
-     */
-    public function __construct(string $messageText)
+    public function __construct(string $messageText, int $invoice_id)
     {
         $this->messageText = $messageText;
+        $this->invoice_id = $invoice_id;
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
     public function build(): self
     {
-        return $this->subject('Test Mail from Laravel')
-                    ->view('mail.test-email')
-                    ->with('messageText', $this->messageText);
+        return $this->from(config('mail.from.address'), config('mail.from.name'))
+                    ->subject('Invoice Payment Request')
+                    ->view('mail.test-email') // Updated path to match actual file location
+                    ->with([
+                        'messageText' => $this->messageText,
+                        'invoice_id' => $this->invoice_id,
+                    ]);
     }
 }

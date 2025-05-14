@@ -3,21 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Transaction extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'customer_id',
-        'invoice_number',
+        'invoice_id',
         'amount',
         'status',
     ];
 
-    public function customer()
+    public function invoice()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(\App\Models\Invoice::class);
     }
 }

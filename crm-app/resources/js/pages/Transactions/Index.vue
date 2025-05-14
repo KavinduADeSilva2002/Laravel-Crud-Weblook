@@ -1,30 +1,39 @@
 <template>
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="text-xl font-semibold text-gray-800">All Transactions</h2>
+      <h2 class="text-xl font-semibold text-gray-800">Transactions</h2>
     </template>
 
-    <div class="max-w-7xl mx-auto mt-8">
-      <table class="w-full border-collapse">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="border px-4 py-2">Invoice #</th>
-            <th class="border px-4 py-2">Customer ID</th>
-            <th class="border px-4 py-2">Amount</th>
-            <th class="border px-4 py-2">Status</th>
-            <th class="border px-4 py-2">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="transaction in transactions" :key="transaction.id" class="hover:bg-gray-100">
-            <td class="border px-4 py-2">{{ transaction.invoice_number }}</td>
-            <td class="border px-4 py-2">{{ transaction.customer_id }}</td>
-            <td class="border px-4 py-2">${{ transaction.amount.toFixed(2) }}</td>
-            <td class="border px-4 py-2 text-green-700 font-semibold">{{ transaction.status }}</td>
-            <td class="border px-4 py-2">{{ new Date(transaction.created_at).toLocaleString() }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+      <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="transaction in transactions" :key="transaction.id">
+              <td class="px-6 py-4 whitespace-nowrap">{{ transaction.invoice_id }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">${{ transaction.amount }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span :class="{
+                  'px-2 inline-flex text-xs leading-5 font-semibold rounded-full': true,
+                  'bg-green-100 text-green-800': transaction.status === 'Success',
+                  'bg-yellow-100 text-yellow-800': transaction.status === 'Pending',
+                  'bg-red-100 text-red-800': transaction.status === 'Failed'
+                }">
+                  {{ transaction.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ new Date(transaction.created_at).toLocaleDateString() }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </AuthenticatedLayout>
 </template>

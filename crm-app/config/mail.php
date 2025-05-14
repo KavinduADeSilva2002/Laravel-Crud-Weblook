@@ -2,8 +2,18 @@
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default Mailer
+    |--------------------------------------------------------------------------
+    */
     'default' => env('MAIL_MAILER', 'smtp'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Mailer Configurations
+    |--------------------------------------------------------------------------
+    */
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
@@ -12,12 +22,40 @@ return [
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'auth_mode' => null,
+        ],
+
+        'log' => [
+            'transport' => 'log',
+            'channel' => env('MAIL_LOG_CHANNEL'),
+        ],
+
+        'array' => [
+            'transport' => 'array',
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Global "From" Address
+    |--------------------------------------------------------------------------
+    */
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'admin@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'My Laravel App'),
+        'name' => env('MAIL_FROM_NAME', 'Weblook CRM'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown Mail Settings
+    |--------------------------------------------------------------------------
+    */
+    'markdown' => [
+        'theme' => 'default',
+
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
 ];

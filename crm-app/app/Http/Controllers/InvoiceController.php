@@ -7,9 +7,11 @@ use App\Models\Customer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Mail\MyEmail;
-use Stripe\Checkout\Session;
 use Stripe\Stripe;
+use Stripe\Checkout\Session;
 
 class InvoiceController extends Controller
 {
@@ -39,7 +41,7 @@ class InvoiceController extends Controller
 
         $invoice = Invoice::create($validated);
 
-        // Automatically send email after creation
+        // Automatically send invoice email
         $this->sendInvoiceEmail($invoice);
 
         return redirect()->route('invoices.index')->with('success', 'Invoice created and email sent successfully.');
@@ -74,26 +76,31 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Send invoice email to the customer with Stripe payment URL.
+     * Send invoice email to the customer with invoice ID link.
      */
     public function sendInvoiceEmail(Invoice $invoice)
     {
-        $paymentUrl = $this->generateStripeCheckoutUrl($invoice);
+        try {
+            $messageText = "Dear {$invoice->name},\n\n"
+                . "This is your invoice for \${$invoice->total_payment}, due on {$invoice->due_date}.\n\n"
+                . "Click below to pay securely via Stripe.";
 
-        $messageText = "Dear {$invoice->name},\n\n"
-            . "This is your invoice for the amount of \${$invoice->total_payment}, due on {$invoice->due_date}.\n\n"
-            . "Please use the button below to make your payment securely via Stripe.";
-
-        Mail::to($invoice->email)->send(new MyEmail($messageText, $paymentUrl));
+            Mail::to($invoice->email)->send(new MyEmail($messageText, $invoice->id));
+        } catch (\Exception $e) {
+            Log::error('Email failed: ' . $e->getMessage());
+            session()->flash('error', 'Failed to send email: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Generate a Stripe Checkout session and return its URL.
+     * Redirect to Stripe checkout manually via link.
      */
-    protected function generateStripeCheckoutUrl(Invoice $invoice)
+    public function redirectToStripe($id)
     {
+        $invoice = Invoice::findOrFail($id);
+
         try {
-            Stripe::setApiKey(config('services.stripe.secret'));
+            Stripe::setApiKey(env('STRIPE_SECRET'));
 
             $session = Session::create([
                 'payment_method_types' => ['card'],
@@ -101,24 +108,57 @@ class InvoiceController extends Controller
                     'price_data' => [
                         'currency' => 'usd',
                         'product_data' => [
-                            'name' => 'Invoice #' . ($invoice->id),
+                            'name' => 'Invoice #' . $invoice->id,
+                            'description' => "Payment for invoice sent to {$invoice->email}",
                         ],
-                        'unit_amount' => $invoice->total_payment * 100, // amount in cents
+                        'unit_amount' => (int)($invoice->total_payment * 100), // Convert to cents
                     ],
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => route('invoices.index') . '?payment=success',
-                'cancel_url' => route('invoices.index') . '?payment=cancelled',
-                'metadata' => [
-                    'invoice_id' => $invoice->id,
-                ],
+                'success_url' => route('invoice.success') . '?invoice_id=' . $invoice->id,
+                'cancel_url' => route('invoice.cancel'),
+                'customer_email' => $invoice->email,
             ]);
 
-            return $session->url;
+            return redirect($session->url);
         } catch (\Exception $e) {
-            // fallback link or error page
-            return url('/invoices') . '?payment=error';
+            Log::error('Stripe error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Payment initiation failed. Please try again.');
         }
+    }
+
+    /**
+     * Handle Stripe payment success and save transaction.
+     */
+    public function paymentSuccess(Request $request)
+    {
+        try {
+            $invoiceId = $request->get('invoice_id');
+            $invoice = Invoice::findOrFail($invoiceId);
+
+            // Update invoice status
+            $invoice->status = 'Paid';
+            $invoice->save();
+
+            // Create transaction record
+            DB::table('transactions')->insert([
+                'invoice_id' => $invoiceId,
+                'amount' => $invoice->total_payment,
+                'status' => 'Success',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return view('payment-success', ['invoice' => $invoice]);
+        } catch (\Exception $e) {
+            Log::error('Payment success handling error: ' . $e->getMessage());
+            return redirect()->route('invoices.index')->with('error', 'Payment verification failed.');
+        }
+    }
+
+    public function paymentCancel()
+    {
+        return redirect()->route('invoices.index')->with('error', 'Payment was cancelled.');
     }
 }

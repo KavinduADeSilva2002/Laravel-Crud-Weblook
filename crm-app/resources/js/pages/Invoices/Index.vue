@@ -86,6 +86,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import axios from 'axios'
+// import { stripCheckout } from '@vue-Stripe/vue-stripe'; 
+// nikn liwwa ekk..psse blnn
 
 const customers = usePage().props.customers
 const invoices = ref(usePage().props.invoices || [])
