@@ -29,8 +29,8 @@ const showingNavigationDropdown = ref(false);
             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
               <NavLink :href="route('dashboard')" :active="route().current('dashboard')">Dashboard</NavLink>
               <NavLink :href="route('customers.index')" :active="route().current('customers.*')">Customers</NavLink>
-              <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">Invoices</NavLink>
               <NavLink :href="route('proposals.index')" :active="route().current('proposals.*')">Proposals</NavLink>
+              <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">Invoices</NavLink>
               <NavLink :href="route('transactions.index')" :active="route().current('transactions.*')">Transactions</NavLink>
             </div>
           </div>
@@ -97,8 +97,8 @@ const showingNavigationDropdown = ref(false);
         <div class="pt-2 pb-3 space-y-1">
           <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">Dashboard</ResponsiveNavLink>
           <ResponsiveNavLink :href="route('customers.index')" :active="route().current('customers.*')">Customers</ResponsiveNavLink>
-          <ResponsiveNavLink :href="route('invoices.index')" :active="route().current('invoices.*')">Invoices</ResponsiveNavLink>
           <ResponsiveNavLink :href="route('proposals.index')" :active="route().current('proposals.*')">Proposals</ResponsiveNavLink>
+          <ResponsiveNavLink :href="route('invoices.index')" :active="route().current('invoices.*')">Invoices</ResponsiveNavLink>
           <ResponsiveNavLink :href="route('transactions.index')" :active="route().current('transactions.*')">Transactions</ResponsiveNavLink>
         </div>
 
