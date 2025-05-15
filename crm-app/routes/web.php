@@ -25,7 +25,7 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
-// ✅ Authenticated Routes
+// Authenticated Routes
 Route::middleware('auth')->group(function () {
 
     // Profile
@@ -62,14 +62,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
 });
 
-// ✅ Simple test route to send mail
+// Simple test route to send mail
 Route::get('/send-test-mail', function () {
     $message = "Hello from Laravel!";
     Mail::to('5f1b9e3e5be55@inbox.mailtrap.io')->send(new MyEmail($message, 1));
     return "✅ Test email sent successfully!";
 });
 
-// ✅ Debug test route with try-catch
+// Debug test route with try-catch
 Route::get('/test-email', function () {
     try {
         Mail::to('5f1b9e3e5be55@inbox.mailtrap.io')->send(new MyEmail('This is a test message from Weblook CRM', 1));
