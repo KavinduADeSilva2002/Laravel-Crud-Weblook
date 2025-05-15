@@ -3,14 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class TransactionController extends Controller
 {
     public function index()
     {
-        $transactions = Transaction::with('invoice')->latest()->get();
+        $transactions = Transaction::with('invoice')->latest()->get()->map(function ($transaction) {
+            return [
+                'id' => $transaction->id,
+                'invoice_id' => $transaction->invoice_id,
+                'customer_name' => $transaction->invoice->name ?? 'N/A', // <- FIXED LINE
+                'amount' => $transaction->amount,
+                'status' => $transaction->status ?? 'Pending',
+                'payment_method' => $transaction->payment_method ?? 'Card Payment',
+                'created_at' => $transaction->created_at->toDateTimeString(),
+            ];
+        });
 
         return Inertia::render('Transactions/Index', [
             'transactions' => $transactions
@@ -25,9 +35,17 @@ class TransactionController extends Controller
             'status' => 'required|string',
         ]);
 
-        Transaction::create($request->all());
+        $invoice = \App\Models\Invoice::find($request->invoice_id);
 
-        return redirect()->route('transactions.index')->with('success', 'Transaction added.');
+        Transaction::create([
+            'invoice_id' => $invoice->id,
+            'amount' => $request->amount,
+            'status' => $request->status,
+            'customer_name' => $invoice->name, // <- STORED IN DB
+            'payment_method' => 'Card Payment',
+        ]);
+
+        return redirect()->route('transactions.index')->with('success', 'Transaction recorded.');
     }
 
     public function show(Transaction $transaction)
@@ -43,7 +61,15 @@ class TransactionController extends Controller
             'status' => 'required|string',
         ]);
 
-        $transaction->update($request->all());
+        $invoice = \App\Models\Invoice::find($request->invoice_id);
+
+        $transaction->update([
+            'invoice_id' => $invoice->id,
+            'amount' => $request->amount,
+            'status' => $request->status,
+            'customer_name' => $invoice->name,
+            'payment_method' => 'Card Payment',
+        ]);
 
         return redirect()->route('transactions.index')->with('success', 'Transaction updated.');
     }

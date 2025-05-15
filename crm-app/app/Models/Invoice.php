@@ -22,14 +22,19 @@ class Invoice extends Model
         'status' => 'Pending'
     ];
 
+    /**
+     * Relationship: Invoice belongs to a Customer
+     */
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
+    /**
+     * Relationship: Invoice has one Transaction
+     */
     public function transaction()
     {
         return $this->hasOne(Transaction::class);
     }
 }
-
