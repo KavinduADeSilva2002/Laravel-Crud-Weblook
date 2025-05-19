@@ -12,8 +12,12 @@ const { customerCount, proposalCount, invoiceCount, transactionCount } = usePage
       <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
     </template>
 
-    <div class="py-12">
-      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <!-- Background Wrapper -->
+    <div 
+      class="py-12 min-h-screen bg-cover bg-center bg-no-repeat" 
+      style="background-image: url('/images/dashboard-bg.jpg');"
+    >
+      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 bg-white/80 p-6 rounded-xl shadow-lg">
 
         <!-- Title and Welcome Message -->
         <div class="mb-8 text-center">
@@ -49,6 +53,7 @@ const { customerCount, proposalCount, invoiceCount, transactionCount } = usePage
             <div class="mt-2 text-3xl font-bold">{{ transactionCount }}</div>
           </div>
         </div>
+
       </div>
     </div>
   </AuthenticatedLayout>
